@@ -13,3 +13,6 @@ Ei vielä oikestaan mikään, koko projekti vielä sen verran alkutekijöissää
 
 ## Mitä teen seuraavaksi?
 Kirjoitan tätä takautuvasti viikolla #2. Alunperin tarkoituksena oli saada hommaa rullaamaan eteenpäin jollakin tasolla.
+
+## Käytetty aika
+Noin 1-2h
