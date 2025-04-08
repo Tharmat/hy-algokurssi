@@ -8,28 +8,33 @@ class Trie:
     def __init__(self):
         self.root = TrieNode()
 
-    def insertWord(self, word):
+    def insertWord(self, word, count = 1):
         current = self.root
 
         for letter in word:
             if letter not in current.children:
                 current.children[letter] = TrieNode()
-            current.children[letter].count += 1
+            current.children[letter].count += count
             current = current.children[letter]
             
         current.is_last = True
 
     def searchWord(self, word):
         current = self.root
+        found_word = []
 
         for letter in word:
             if letter not in current.children:
                 return False
             current = current.children[letter]
-        return current.is_last
+            found_word.append((letter, current.count))
+        if current.is_last:
+            return True, found_word
+        return False
     
     def printNodes(self, node = None, depth = 0):
         if node is None:
+            print()
             node = self.root
         for key, value in node.children.items():
             print(" " * depth, end = " ")
