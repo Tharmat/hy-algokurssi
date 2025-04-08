@@ -28,11 +28,13 @@ class Trie:
             current = current.children[letter]
         return current.is_last
     
-def printNodes(node, depth = 0):
-    for key, value in node.children.items():
-        print(" " * depth, end = " ")
-        print(key, ":", value.count)
-        depth += 1
-        printNodes(node.children[key], depth)
-        depth -= 1
+    def printNodes(self, node = None, depth = 0):
+        if node is None:
+            node = self.root
+        for key, value in node.children.items():
+            print(" " * depth, end = " ")
+            print(key, ":", value.count)
+            depth += 1
+            self.printNodes(node.children[key], depth)
+            depth -= 1
         

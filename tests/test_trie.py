@@ -1,10 +1,9 @@
-from src.trie import Trie, TrieNode, printNodes
+from src.trie import Trie
 import unittest
 
 class TestTrie(unittest.TestCase):
     def setUp(self):
         self.trie = Trie()
-        self.trie.debug = True
         self.trie.insertWord("Foo")
         self.trie.insertWord("Foo")
         self.trie.insertWord("Fooo")
@@ -13,7 +12,7 @@ class TestTrie(unittest.TestCase):
         self.trie.insertWord("Whizz")
 
     def test_found(self):
-        printNodes(self.trie.root)
+        self.trie.printNodes()
         self.assertEqual(self.trie.searchWord("Foo"), True)
         self.assertEqual(self.trie.searchWord("FooBar"), True)
         self.assertEqual(self.trie.searchWord("Whizz"), True)
