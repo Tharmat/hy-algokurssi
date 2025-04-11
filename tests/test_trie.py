@@ -4,18 +4,19 @@ import unittest
 class TestTrie(unittest.TestCase):
     def setUp(self):
         self.trie = Trie()
-        self.trie.insertWord("Foo")
-        self.trie.insertWord("Foo")
-        self.trie.insertWord("Fooo")
-        self.trie.insertWord("FooBar")
-        self.trie.insertWord("foo")
-        self.trie.insertWord("Whizz")
+        self.trie.insertNode("Foo")
+        self.trie.insertNode("Foo")
+        self.trie.insertNode("Fooo")
+        self.trie.insertNode("FooBar")
+        self.trie.insertNode("foo")
+        self.trie.insertNode("Whizz")
 
-        self.trie.insertWord("Bugged", 10)
-        self.trie.insertWord("Bug", 10)
+        self.trie.insertNode("Bugged", 10)
+        self.trie.insertNode("Bug", 10)
+        self.trie.insertNode([160, 66, 63])
     
     def construct_and_assert(self, input, result):
-        self.assertEqual(self.trie.searchWord(input), result)
+        self.assertEqual(self.trie.searchObject(input), result)
     
     def test_found1(self):
         input = "Foo"
