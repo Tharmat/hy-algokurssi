@@ -9,8 +9,17 @@ def get_tempo(mid):
         if msg.type == 'set_tempo':
             tempo = msg.tempo
             print("Tempo is:", tempo)
+            print("---------")
+
     return tempo
 
+# Returns the program change (instrument change) from the midi 
+def get_instrument(track):
+    for msg in track:
+        if msg.type  == 'program_change':
+            print("Instrument is:", msg)
+            return msg
+        
 # List track details for debugging
 def list_track_details(tracks):
     for i, track in enumerate(tracks):
@@ -23,7 +32,9 @@ def list_track_details(tracks):
                     note_information[msg.note] = 0
                 note_information[msg.note] += 1
         print(note_information)
+    print("---------")
 
+# Plays the given midi file
 def play_midi(midi_file):
     for msg in midi_file.play():
 
@@ -32,10 +43,12 @@ def play_midi(midi_file):
         port.send(msg)
 
 # TODO: WIP, requires more though and cleaning up. This is just a prototype for processing the midi events and eventually will save everything into a trie data
-# structure for applying Markov chains
+# structure for later use by Markov chain
 def process_midi(new, old):
 
     trie = Trie()
+
+    # TODO: This should be dependant on the chosen order of the Markov chain
     sliding_note_window = Queue(maxsize = 3)
 
     # Loop through existing midi track, pick only note_on and note_off events (or note_on with velocity = 0) and create a new track with fixed duration of notes
@@ -60,14 +73,14 @@ def process_midi(new, old):
                 sliding_note_window.put(msg.note)
                 
                 # TODO: Quantize note lenghts if tempo information is wanted
-                note_duration = 0
+                # note_duration = 0
 
-                for i in range(x + 1, len(old)):
-                    next_message = old[i]
-                    note_duration += next_message.time
+                # for i in range(x + 1, len(old)):
+                #    next_message = old[i]
+                #    note_duration += next_message.time
 
-                    if next_message.type == 'note_on' and next_message.velocity == 0:
-                        break
+                #    if next_message.type == 'note_on' and next_message.velocity == 0:
+                #        break
                 
                 # For debugging. Note duration works in a weird magical way in midi files and does not not correspond to more traditional BPM
                 # print("Note duration is:", mido.tick2second(note_duration, mid.ticks_per_beat, tempo))
@@ -107,17 +120,22 @@ new_track.append(mido.MetaMessage('set_tempo', tempo=tempo))
 # Hard code the track for debugging
 TRACK = 1
 
+new_track.append(get_instrument(mid.tracks[TRACK]))
+
 # Process the given midi file to onclude only note_on and note_off events and quantize everything to fixed amount
 trie = process_midi(new_track, mid.tracks[TRACK])
+
+# Generate series of notes based on the probabilities from the ingested midi file
 markov = Markov()
+notes = markov.run(trie)
 
+# Create a new midi track based on the Markov-chain generated notes using fixed velocities and timing
+for note in notes:
+    new_track.append(mido.Message('note_on', channel = 1, note = note, velocity = 96, time = 1))
+    new_track.append(mido.Message('note_off', channel = 1, note = note, time = mido.second2tick(0.5, mid.ticks_per_beat, tempo)))  
 
-NOTES = 16
-
-for _ in range(NOTES):
-    for note in markov.run(trie):
-        new_track.append(mido.Message('note_on', channel = 1, note = note, velocity = 96, time = 1))
-        new_track.append(mido.Message('note_on', channel = 1, note = note, velocity = 0, time = mido.second2tick(0.5, mid.ticks_per_beat, tempo)))  
+# Append a dummy eight note to the end of the midi file to prevent suddent cut of playback
+new_track.append(mido.Message('note_off', channel = 1, note = 0, time = mido.second2tick(0.5, mid.ticks_per_beat, tempo)))  
 
 # Play the newly constructed midi file
 play_midi(new_file)
