@@ -14,4 +14,4 @@ class TestTrie(unittest.TestCase):
 
     def test_dummy(self):
         markov = Markov()
-        markov.run(10, self.trie)
+        markov.run(self.trie)
